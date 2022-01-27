@@ -70,6 +70,11 @@ public class CrashHandle : ModuleRules
 					"Sockets",
 				}
 			);
+			PublicDefinitions.Add("WITH_LIBCURL=1");
+		}
+		else
+		{
+			PublicDefinitions.Add("WITH_LIBCURL=0");
 		}
 	}
 }

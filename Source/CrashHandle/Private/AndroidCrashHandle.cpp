@@ -3,6 +3,7 @@
 #include "Android/AndroidPlatformStackWalk.h"
 #include "Misc/FeedbackContext.h"
 #include "HttpReport.h"
+#include "CrashHandle.h"
 
 void FAndroidCrashHandle::DefaultCrashHandler(const FGenericCrashContext& _Context)
 {
@@ -18,7 +19,7 @@ void FAndroidCrashHandle::DefaultCrashHandler(const FGenericCrashContext& _Conte
 
 		// Walk the stack and dump it to the allocated memory.
 		FPlatformStackWalk::StackWalkAndDump(StackTrace, StackTraceSize, 0, Context.Context);
-		UE_LOG(LogTemp, Error, TEXT("\n%s\n"), ANSI_TO_TCHAR(StackTrace));
+		UE_LOG(CrashHandle, Error, TEXT("\n%s\n"), ANSI_TO_TCHAR(StackTrace));
 
 		if (GLog)
 		{

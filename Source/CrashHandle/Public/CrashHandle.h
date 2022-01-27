@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(CrashHandle, Log, All);
+
 class CRASHHANDLE_API FCrashHandleModule : public IModuleInterface
 {
 public:
