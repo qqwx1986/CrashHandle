@@ -27,9 +27,10 @@ void FCrashHandleModule::StartupModule()
 		GConfig->GetString(SectionName,TEXT("CrashReportPath"), Settings.CrashReportPath, ConfigIniPath);
 		GConfig->GetString(SectionName,TEXT("Version"), Settings.Version, ConfigIniPath);
 	}
-#if UE_EDITOR
+#if UE_EDITOR || UE_BUILD_SHIPPING
 	Settings.bEnableDev = false;
 #endif
+	
 	if (Settings.bEnableDev)
 	{
 		Settings.ServerUrl = Settings.DevServerUrl;
