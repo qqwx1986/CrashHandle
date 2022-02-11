@@ -8,14 +8,19 @@
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "CrashHandle.h"
+#if PLATFORM_ANDROID
+#include "Android/AndroidPlatformMisc.h"
+#endif
 
 FString UCrashHandleBlueprintLibrary::BinaryVersion;
-FString UCrashHandleBlueprintLibrary::ResourceVersion = TEXT("1.0");
+FString UCrashHandleBlueprintLibrary::ResourceVersion;
 
 TSharedPtr<FJsonObject> UCrashHandleBlueprintLibrary::GetDeviceInfo()
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShared<FJsonObject>();
 	FString Platform, DeviceId;
+	FString Cpu = FPlatformMisc::GetCPUBrand();
+	FString DeviceBrand = FPlatformMisc::GetCPUBrand();
 #if PLATFORM_WINDOWS
 	Platform = "windows";
 	DeviceId = FPlatformMisc::GetLoginId();
@@ -23,6 +28,7 @@ TSharedPtr<FJsonObject> UCrashHandleBlueprintLibrary::GetDeviceInfo()
 #if PLATFORM_ANDROID
 	Platform = "android";
 	DeviceId = FPlatformMisc::GetDeviceId();
+	Cpu = FAndroidMisc::GetCPUChipset();
 #endif
 #if PLATFORM_LINUX
 	Platform = "linux";
@@ -38,7 +44,8 @@ TSharedPtr<FJsonObject> UCrashHandleBlueprintLibrary::GetDeviceInfo()
 #endif
 	JsonObject->SetStringField(TEXT("Platform"), Platform);
 	JsonObject->SetStringField(TEXT("DeviceId"), DeviceId);
-	JsonObject->SetStringField(TEXT("Cpu"), FPlatformMisc::GetCPUBrand());
+	JsonObject->SetStringField(TEXT("Cpu"), Cpu);
+	JsonObject->SetStringField(TEXT("DeviceBrand"), DeviceBrand);
 	JsonObject->SetStringField(TEXT("Gpu"), FPlatformMisc::GetPrimaryGPUBrand());
 	JsonObject->SetNumberField(TEXT("Memory"), FPlatformMemory::GetConstants().TotalPhysicalGB);
 	FString OSVersionLabel, OSSubVersionLabel;
@@ -117,12 +124,20 @@ bool UCrashHandleBlueprintLibrary::EnableErrorReport()
 void UCrashHandleBlueprintLibrary::CrashTest()
 {
 	int* a = nullptr;
+	UE_LOG(CrashHandle, Log, TEXT("%d"), *a);
 	*a = 1;
+	UE_LOG(CrashHandle, Log, TEXT("%d"), *a);
 }
 
-void UCrashHandleBlueprintLibrary::InitVersion()
+void UCrashHandleBlueprintLibrary::InitVersion(const FString& Version)
 {
 	const UCrashHandleSetting& Settings = *GetDefault<UCrashHandleSetting>();
+	BinaryVersion = Version;
+	if (BinaryVersion.IsEmpty())
+	{
+		BinaryVersion = TEXT("latest");
+	}
+	ResourceVersion = TEXT("latest");
 #if !UE_BUILD_SHIPPING
 	if (!Settings.bEnableDev)
 	{
@@ -139,13 +154,16 @@ void UCrashHandleBlueprintLibrary::InitVersion()
 		{
 			PlatformFile.CreateDirectory(*EngineBinariesDirectory);
 		}
-		FString ExecutePath = FPlatformProcess::ExecutablePath();
-		FMD5Hash Hash = FMD5Hash::HashFile(*ExecutePath);
-		FString Md5Str = LexToString(Hash);
-
+		FString NewVersion = Settings.Version;
+		if (NewVersion.IsEmpty())
+		{
+			FString ExecutePath = FPlatformProcess::ExecutablePath();
+			FMD5Hash Hash = FMD5Hash::HashFile(*ExecutePath);
+			NewVersion = LexToString(Hash);
+		}
 		TSharedPtr<FJsonObject> JsonObject = MakeShared<FJsonObject>();
 		JsonObject->SetStringField(TEXT("Url"), Settings.ServerUrl);
-		JsonObject->SetStringField(TEXT("Ver"), Md5Str);
+		JsonObject->SetStringField(TEXT("Ver"), NewVersion);
 
 		FString StrJson;
 		TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&StrJson);

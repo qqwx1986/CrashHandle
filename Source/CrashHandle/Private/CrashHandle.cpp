@@ -11,8 +11,6 @@ DEFINE_LOG_CATEGORY(CrashHandle);
 void FCrashHandleModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-	FString out_OSVersionLabel, out_OSSubVersionLabel;
-	FPlatformMisc::GetOSVersions(out_OSVersionLabel, out_OSSubVersionLabel);
 	const TCHAR* SectionName = TEXT("/Script/CrashHandle.CrashHandleSetting");
 	const FString ConfigIniPath = FPaths::SourceConfigDir().Append(TEXT("DefaultCrashHandle.ini"));
 	UCrashHandleSetting& Settings = *GetMutableDefault<UCrashHandleSetting>();
@@ -26,6 +24,8 @@ void FCrashHandleModule::StartupModule()
 		GConfig->GetString(SectionName,TEXT("ServerUrl"), Settings.ServerUrl, ConfigIniPath);
 		GConfig->GetString(SectionName,TEXT("DevServerUrl"), Settings.DevServerUrl, ConfigIniPath);
 		GConfig->GetString(SectionName,TEXT("ErrorReportPath"), Settings.ErrorReportPath, ConfigIniPath);
+		GConfig->GetString(SectionName,TEXT("CrashReportPath"), Settings.CrashReportPath, ConfigIniPath);
+		GConfig->GetString(SectionName,TEXT("Version"), Settings.Version, ConfigIniPath);
 	}
 #if UE_EDITOR
 	Settings.bEnableDev = false;
@@ -35,7 +35,7 @@ void FCrashHandleModule::StartupModule()
 		Settings.ServerUrl = Settings.DevServerUrl;
 	}
 	FHttpReport::RegisterCrashHandler();
-	UCrashHandleBlueprintLibrary::InitVersion();
+	UCrashHandleBlueprintLibrary::InitVersion(Settings.Version);
 }
 
 void FCrashHandleModule::ShutdownModule()

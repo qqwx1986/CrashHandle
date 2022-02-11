@@ -1,7 +1,7 @@
 #pragma once
 #if PLATFORM_ANDROID
 
-#include "Android/AndroidPlatformCrashContext.h"
+#include "GenericPlatform/GenericPlatformCrashContext.h"
 
 class FAndroidCrashHandle
 {

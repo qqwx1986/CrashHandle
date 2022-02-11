@@ -1,6 +1,6 @@
 #pragma once
 #if PLATFORM_IOS
-#incldue "IOS/IOSPlatformCrashContext.h"
+#include "GenericPlatform/GenericPlatformCrashContext.h"
 class FIOSCrashHandle
 {
 public:

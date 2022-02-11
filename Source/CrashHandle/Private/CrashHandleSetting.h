@@ -15,17 +15,23 @@ class UCrashHandleSetting : public UObject
 	GENERATED_BODY()
 public:
 	UPROPERTY(config, EditAnywhere, Category = "Setting")
+	FString Version;
+
+	UPROPERTY(config, EditAnywhere, Category = "Setting")
 	FString ServerUrl;
 
 	UPROPERTY(config, EditAnywhere, Category = "Setting")
 	FString ErrorReportPath = TEXT("/receiverError");
 
+	UPROPERTY(Config, EditAnywhere, Category = "Setting")
+	FString CrashReportPath = TEXT("/receiverCrash");
+
 	UPROPERTY(config, EditAnywhere, Category = "Setting")
 	bool bEnableDev = false;
-	
+
 	UPROPERTY(config, EditAnywhere, Category = "Setting")
 	FString DevServerUrl;
-	
+
 	UPROPERTY(config, EditAnywhere, Category = "Setting")
 	bool bGenCrashConfig = true;
 

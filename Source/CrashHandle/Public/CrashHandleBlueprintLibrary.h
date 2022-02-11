@@ -13,9 +13,10 @@ UCLASS()
 class CRASHHANDLE_API UCrashHandleBlueprintLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	static FString BinaryVersion;
 	static FString ResourceVersion;
 public:
+	static FString BinaryVersion;
+
 	UFUNCTION(BlueprintCallable, Category = "CrashHandleBlueprintLibrary")
 	static void ReportError(const FString& Error);
 	UFUNCTION(BlueprintCallable, Category = "CrashHandleBlueprintLibrary")
@@ -27,5 +28,5 @@ public:
 	static void CrashTest();
 
 	static TSharedPtr<FJsonObject> GetDeviceInfo();
-	static void InitVersion();
+	static void InitVersion(const FString& Version);
 };

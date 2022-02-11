@@ -9,7 +9,6 @@ public:
 		IOS,
 		Linux,
 	};
-	static class UCrashHandleSetting* Setting;
 	static void Reporter(FPlatformType Type,const FString& LogFile,const FString& DumpInfo);
 	static void RegisterCrashHandler();
 };

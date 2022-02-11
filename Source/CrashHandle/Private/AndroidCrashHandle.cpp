@@ -1,6 +1,7 @@
 #include "AndroidCrashHandle.h"
 #if PLATFORM_ANDROID
 #include "Android/AndroidPlatformStackWalk.h"
+#include "Android/AndroidPlatformCrashContext.h"
 #include "Misc/FeedbackContext.h"
 #include "HttpReport.h"
 #include "CrashHandle.h"
@@ -31,7 +32,7 @@ void FAndroidCrashHandle::DefaultCrashHandler(const FGenericCrashContext& _Conte
 		{
 			GWarn->Flush();
 		}
-		FHttpReport::Reporter(FHttpReport::Android,FPaths::ProjectLogDir()/TEXT("TP_ThirdPerson.log"),FString(ANSI_TO_TCHAR(StackTrace)));
+		FHttpReport::Reporter(FHttpReport::Android,TEXT(""),FString(ANSI_TO_TCHAR(StackTrace)));
 
 	}
 }
