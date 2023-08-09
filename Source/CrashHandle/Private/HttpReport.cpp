@@ -1,13 +1,13 @@
 #include "HttpReport.h"
 
-#include "CrashHandleSetting.h"
-#include "HttpModule.h"
-#include "Dom/JsonObject.h"
-#include "Serialization/JsonSerializer.h"
-#include "Misc/FileHelper.h"
 #include "CrashHandle.h"
 #include "CrashHandleBlueprintLibrary.h"
+#include "CrashHandleSetting.h"
+#include "HttpModule.h"
 #include "SocketSubsystem.h"
+#include "Dom/JsonObject.h"
+#include "Misc/FileHelper.h"
+#include "Serialization/JsonSerializer.h"
 #if PLATFORM_IOS
 #include "IOSCrashHandle.h"
 #endif
@@ -106,8 +106,8 @@ void FHttpReport::RegisterCrashHandler()
 	FPlatformMisc::SetCrashHandler(DefaultCrashHandler);
 }
 
-#if WITH_LIBCURL
-#include "curl/curl.h"
+//#if WITH_LIBCURL
+//#include "curl/curl.h"
 
 static size_t StaticReadFn(void* Ptr, size_t SizeInBlocks, size_t BlockSizeInBytes, void* UserData)
 {
@@ -164,8 +164,28 @@ static void SendHttpSync(const FString& Platform, const FString& InUrl, const FS
 		{
 		}
 	}
-	CURL* Curl = curl_easy_init();
-	curl_slist* CurlHeaders = nullptr;
+
+
+	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+
+	HttpRequest->SetVerb("POST");
+	HttpRequest->SetHeader("Content-Type", "application/json");
+	HttpRequest->SetURL(*FString::Printf(TEXT("%s"), *Url));
+	HttpRequest->SetContentAsString(Content);
+	HttpRequest->OnProcessRequestComplete().BindLambda([&](FHttpRequestPtr req, FHttpResponsePtr res, bool bSucceeded){
+		if(bSucceeded)
+		{
+			GLog->Log("FHttpReport::SendHttpSync Data Uploaded ");
+		}
+		else
+		{
+			GLog->Log("Error FHttpReport::SendHttpSync Data Upload Failed");
+		}
+	});
+	HttpRequest->ProcessRequest();
+	
+	/*CURL* Curl = curl_easy_init();
+	/*curl_slist* CurlHeaders = nullptr;
 
 	curl_easy_setopt(Curl, CURLOPT_URL,TCHAR_TO_ANSI(*Url));
 	curl_easy_setopt(Curl, CURLOPT_POST, 1L);
@@ -194,10 +214,10 @@ static void SendHttpSync(const FString& Platform, const FString& InUrl, const FS
 	FPlatformMisc::LowLevelOutputDebugStringf(
 		TEXT("SendHttpSync %s, %d, %d"), *Url, (int)CurlResult, (int)ResponseCode);
 	curl_slist_free_all(CurlHeaders);
-	curl_easy_cleanup(Curl);
+	curl_easy_cleanup(Curl);*/
 }
-#else
-static void SendHttpSync(const FString& Platform, const FString& Url, const FString& Content)
-{
-}
-#endif
+//#else
+// static void SendHttpSync(const FString& Platform, const FString& Url, const FString& Content)
+// {
+// }
+//#endif

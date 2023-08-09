@@ -10,8 +10,8 @@ public class CrashHandle : ModuleRules
 		{
 			return Target.Platform.IsInGroup(UnrealPlatformGroup.Windows) ||
 			       Target.IsInPlatformGroup(UnrealPlatformGroup.Unix) ||
-			       Target.IsInPlatformGroup(UnrealPlatformGroup.Android) ||
-			       Target.Platform == UnrealTargetPlatform.Switch;
+			       Target.IsInPlatformGroup(UnrealPlatformGroup.Android);
+				//||Target.Platform == UnrealTargetPlatform.Switch;
 		}
 	}
 	public CrashHandle(ReadOnlyTargetRules Target) : base(Target)
@@ -64,7 +64,7 @@ public class CrashHandle : ModuleRules
 		
 		if (bPlatformSupportsLibCurl)
 		{
-			AddEngineThirdPartyPrivateStaticDependencies(Target, "libcurl");
+			//AddEngineThirdPartyPrivateStaticDependencies(Target, "libcurl");
 			PrivateDependencyModuleNames.AddRange(
 				new string[] {
 					"Sockets",
